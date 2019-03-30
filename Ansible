@@ -1,0 +1,22 @@
+---
+- hosts: localhost
+  become: yes
+  tasks:
+  - name: update packages and install tomcat
+    apt:
+      - name: tomcat7
+        state: present
+        update_cache: yes
+    notify: 
+      - restart tomcat
+  - name: download  jar file 
+    get_url:
+      url: https://s3-us-west-1.amazonaws.com/s3-bucket-deops/sm-core-2.4.0.jar
+      dest: /var/lib/tomcat7/webapps/shopizer.jar
+    notify:
+      - restart tomcat
+  handlers:
+  - name: restart tomcat
+    service:
+      - name: tomcat7
+        state: restarted
